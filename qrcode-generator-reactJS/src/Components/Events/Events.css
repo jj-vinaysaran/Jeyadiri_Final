@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.events-container {
+  padding: 20px;
+}
+
+.events-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.events-head {
+  flex: 1;
+}
+
+.events-heading {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}
+
+.event-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.events-bottom {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  margin-top: 25px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.event-name {
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 10px;
+}
+
+.event-details {
+  margin: 0;
+}
+
+.detail-label {
+  font-weight: bold;
+}
+
+.button-group {
+  margin-top: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.generate-qr-btn,
+.attendance-btn,
+.on-certificate-btn,
+.off-certificate-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 300px;
+}
+
+.generate-qr-btn:hover,
+.attendance-btn:hover,
+.on-certificate-btn:hover,
+.off-certificate-btn:hover {
+  background-color: #0056b3;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.btn_grp {
+  margin-top: 10px;
+  width: 100%;
+  height: 20%;
+  /* background: rebeccapurple; */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 1rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .events-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .event-btn {
+    margin-top: 10px;
+  }
+
+  .events-bottom {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  .generate-qr-btn,
+  .attendance-btn,
+  .on-certificate-btn,
+  .off-certificate-btn {
+    width: 300px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+  .events-top {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .event-card {
+    padding: 15px;
+  }
+
+  .event-name {
+    font-size: 18px;
+  }
+
+  .event-details {
+    font-size: 14px;
+  }
+
+  .button-group button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}

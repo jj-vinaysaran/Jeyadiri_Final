@@ -1,0 +1,78 @@
+/* Register.css */
+.admin-register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.admin-register-container {
+  max-width: 400px;
+  width: 100%;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+.admin-register-heading {
+  text-align: center;
+  color: #333;
+}
+
+.admin-register-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.admin-register-input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.admin-register-button {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.admin-register-button:hover {
+  background-color: #2980b9;
+}
+
+.admin-register-login-text {
+  text-align: center;
+  margin-top: 20px;
+  color: #555;
+}
+
+.admin-register-login-text a {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.admin-register-login-text a:hover {
+  text-decoration: underline;
+}
+
+.admin-certificate-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #27ae60;
+  cursor: pointer;
+}
+
+.admin-certificate-link:hover {
+  text-decoration: underline;
+}
