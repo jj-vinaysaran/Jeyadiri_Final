@@ -47,170 +47,173 @@ app.get("/createtable/:eventname", async (req, res) => {
       password VARCHAR(255) DEFAULT NULL  ,
       ParentOrVisitor varchar(255) DEFAULT NULL,
       Occupation varchar(255) DEFAULT NULL,
-      Email varchar(255) DEFAULT NULL
-      );
-      `;
-      
-      try {
-        await sequelize.query(tableQuery);
-        res.status(200).json({ message: `Table ${eventname}Attendance created successfully` });
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Internal Server Error" });
-      }
-    });
-    
+      Email varchar(255) DEFAULT NULL,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+  `;
+  
+  try {
+    await sequelize.query(tableQuery);
+    res.status(200).json({ message: `Table ${eventname}Attendance created successfully` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
-    app.post("/post/:register", async (req, res) => {
-      try {
-        const { register } = req.params;
-        const {
-          fullName,
-          icNumber,
-          dateOfBirth,
-          schoolName,
-          date,
-          Class,
-          Race,
-          Fathername,
-          fatherage,
-          fatheroccupation,
-          fatherstatus,
-          mothername,
-          motherage,
-          motheroccupation,
-          motherstatus,
-          homeaddress,
-          state,
-          district,
-          phonenumber,
-          phonenumberfather,
-          phonenumbermother,
-          picture,
-          whoami,
-          selectedSchoolState,
-          selectedSchoolDistrict,
-          password,
-          Occupation,
-          ParentOrVisitor,
-          Email
-        } = req.body;
-    
-        // Check if the user is already registered
-        const existingUserQuery = `
-          SELECT * FROM ${register}Attendance
-          WHERE icNumber = :icNumber OR phonenumber = :phonenumber OR Email = :Email;
-        `;
-    
-        const existingUser = await sequelize.query(existingUserQuery, {
-          replacements: { icNumber, phonenumber, Email },
-          type: Sequelize.QueryTypes.SELECT
-        });
-    
-        if (existingUser.length > 0) {
-          // User already exists, return error message
-          return res.status(400).json({ error: "User already registered" });
-        }
-    
-        // User is not registered, proceed with registration
-        const tableQuery = `
-          CREATE TABLE IF NOT EXISTS ${register}Attendance (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            fullName VARCHAR(255) DEFAULT NULL,
-            icNumber VARCHAR(255) DEFAULT NULL,
-            dateOfBirth VARCHAR(255) DEFAULT NULL,
-            schoolName VARCHAR(255) DEFAULT NULL,
-            date VARCHAR(255) DEFAULT NULL,
-            Class VARCHAR(255) DEFAULT NULL,
-            Race VARCHAR(255) DEFAULT NULL,
-            Fathername VARCHAR(255) DEFAULT NULL,
-            fatherage VARCHAR(255) DEFAULT NULL,
-            fatheroccupation VARCHAR(255) DEFAULT NULL,
-            fatherstatus VARCHAR(255) DEFAULT NULL,
-            mothername VARCHAR(255) DEFAULT NULL,
-            motherage VARCHAR(255) DEFAULT NULL,
-            motheroccupation VARCHAR(255) DEFAULT NULL,
-            motherstatus VARCHAR(255) DEFAULT NULL,
-            homeaddress VARCHAR(255) DEFAULT NULL,
-            state VARCHAR(255) DEFAULT NULL,
-            district VARCHAR(255) DEFAULT NULL,
-            phonenumber VARCHAR(255) DEFAULT NULL,
-            phonenumberfather VARCHAR(255) DEFAULT NULL,
-            phonenumbermother VARCHAR(255) DEFAULT NULL,
-            picture VARCHAR(255) DEFAULT NULL,
-            whoami VARCHAR(255) DEFAULT NULL,
-            selectedSchoolState VARCHAR(255) DEFAULT NULL,
-            selectedSchoolDistrict VARCHAR(255) DEFAULT NULL,
-            password VARCHAR(255) DEFAULT NULL,
-            ParentOrVisitor varchar(255) DEFAULT NULL,
-            Occupation varchar(255) DEFAULT NULL,
-            Email varchar(255) DEFAULT NULL
-          );
-        `;
-    
-        await sequelize.query(tableQuery);
-    
-        const hashedPassword = await bcrypt.hash(password, 10);
-    
-        // Insert data into the table
-        const insertQuery = `
-          INSERT INTO ${register}Attendance (
-            fullName, icNumber, dateOfBirth, schoolName, date, Class, Race, Fathername, fatherage,
-            fatheroccupation, fatherstatus, mothername, motherage, motheroccupation, motherstatus,
-            homeaddress, state, district, phonenumber, phonenumberfather, phonenumbermother, picture,
-            whoami, selectedSchoolState, selectedSchoolDistrict, password, Occupation, ParentOrVisitor,
-            Email
-          )
-          VALUES (
-            :fullName, :icNumber, :dateOfBirth, :schoolName, :date, :Class, :Race, :Fathername, :fatherage,
-            :fatheroccupation, :fatherstatus, :mothername, :motherage, :motheroccupation, :motherstatus,
-            :homeaddress, :state, :district, :phonenumber, :phonenumberfather, :phonenumbermother, :picture,
-            :whoami, :selectedSchoolState, :selectedSchoolDistrict, :hashedPassword, :Occupation, :ParentOrVisitor,
-            :Email
-          );
-        `;
-    
-        await sequelize.query(insertQuery, {
-          replacements: {
-            fullName,
-            icNumber,
-            dateOfBirth,
-            schoolName,
-            date,
-            Class,
-            Race,
-            Fathername,
-            fatherage,
-            fatheroccupation,
-            fatherstatus,
-            mothername,
-            motherage,
-            motheroccupation,
-            motherstatus,
-            homeaddress,
-            state,
-            district,
-            phonenumber,
-            phonenumberfather,
-            phonenumbermother,
-            picture,
-            whoami,
-            selectedSchoolState,
-            selectedSchoolDistrict,
-            hashedPassword,
-            Occupation,
-            ParentOrVisitor,
-            Email
-          }
-        });
-    
-        res.status(201).json({ message: "Data inserted successfully" });
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Internal Server Error" });
+app.post("/post/:register", async (req, res) => {
+  try {
+    const { register } = req.params;
+    const {
+      fullName,
+      icNumber,
+      dateOfBirth,
+      schoolName,
+      date,
+      Class,
+      Race,
+      Fathername,
+      fatherage,
+      fatheroccupation,
+      fatherstatus,
+      mothername,
+      motherage,
+      motheroccupation,
+      motherstatus,
+      homeaddress,
+      state,
+      district,
+      phonenumber,
+      phonenumberfather,
+      phonenumbermother,
+      picture,
+      whoami,
+      selectedSchoolState,
+      selectedSchoolDistrict,
+      password,
+      Occupation,
+      ParentOrVisitor,
+      Email
+    } = req.body;
+
+    // Check if the user is already registered
+    const existingUserQuery = `
+      SELECT * FROM ${register}Attendance
+      WHERE icNumber = :icNumber OR phonenumber = :phonenumber OR Email = :Email;
+    `;
+
+    const existingUser = await sequelize.query(existingUserQuery, {
+      replacements: { icNumber, phonenumber, Email },
+      type: Sequelize.QueryTypes.SELECT
+    });
+
+    if (existingUser.length > 0) {
+      // User already exists, return error message
+      return res.status(400).json({ error: "User already registered" });
+    }
+
+    // User is not registered, proceed with registration
+    const tableQuery = `
+      CREATE TABLE IF NOT EXISTS ${register}Attendance (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        fullName VARCHAR(255) DEFAULT NULL,
+        icNumber VARCHAR(255) DEFAULT NULL,
+        dateOfBirth VARCHAR(255) DEFAULT NULL,
+        schoolName VARCHAR(255) DEFAULT NULL,
+        date VARCHAR(255) DEFAULT NULL,
+        Class VARCHAR(255) DEFAULT NULL,
+        Race VARCHAR(255) DEFAULT NULL,
+        Fathername VARCHAR(255) DEFAULT NULL,
+        fatherage VARCHAR(255) DEFAULT NULL,
+        fatheroccupation VARCHAR(255) DEFAULT NULL,
+        fatherstatus VARCHAR(255) DEFAULT NULL,
+        mothername VARCHAR(255) DEFAULT NULL,
+        motherage VARCHAR(255) DEFAULT NULL,
+        motheroccupation VARCHAR(255) DEFAULT NULL,
+        motherstatus VARCHAR(255) DEFAULT NULL,
+        homeaddress VARCHAR(255) DEFAULT NULL,
+        state VARCHAR(255) DEFAULT NULL,
+        district VARCHAR(255) DEFAULT NULL,
+        phonenumber VARCHAR(255) DEFAULT NULL,
+        phonenumberfather VARCHAR(255) DEFAULT NULL,
+        phonenumbermother VARCHAR(255) DEFAULT NULL,
+        picture VARCHAR(255) DEFAULT NULL,
+        whoami VARCHAR(255) DEFAULT NULL,
+        selectedSchoolState VARCHAR(255) DEFAULT NULL,
+        selectedSchoolDistrict VARCHAR(255) DEFAULT NULL,
+        password VARCHAR(255) DEFAULT NULL,
+        ParentOrVisitor varchar(255) DEFAULT NULL,
+        Occupation varchar(255) DEFAULT NULL,
+        Email varchar(255) DEFAULT NULL,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      );
+    `;
+
+    await sequelize.query(tableQuery);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert data into the table
+    const insertQuery = `
+      INSERT INTO ${register}Attendance (
+        fullName, icNumber, dateOfBirth, schoolName, date, Class, Race, Fathername, fatherage,
+        fatheroccupation, fatherstatus, mothername, motherage, motheroccupation, motherstatus,
+        homeaddress, state, district, phonenumber, phonenumberfather, phonenumbermother, picture,
+        whoami, selectedSchoolState, selectedSchoolDistrict, password, Occupation, ParentOrVisitor,
+        Email
+      )
+      VALUES (
+        :fullName, :icNumber, :dateOfBirth, :schoolName, :date, :Class, :Race, :Fathername, :fatherage,
+        :fatheroccupation, :fatherstatus, :mothername, :motherage, :motheroccupation, :motherstatus,
+        :homeaddress, :state, :district, :phonenumber, :phonenumberfather, :phonenumbermother, :picture,
+        :whoami, :selectedSchoolState, :selectedSchoolDistrict, :hashedPassword, :Occupation, :ParentOrVisitor,
+        :Email
+      );
+    `;
+
+    await sequelize.query(insertQuery, {
+      replacements: {
+        fullName,
+        icNumber,
+        dateOfBirth,
+        schoolName,
+        date,
+        Class,
+        Race,
+        Fathername,
+        fatherage,
+        fatheroccupation,
+        fatherstatus,
+        mothername,
+        motherage,
+        motheroccupation,
+        motherstatus,
+        homeaddress,
+        state,
+        district,
+        phonenumber,
+        phonenumberfather,
+        phonenumbermother,
+        picture,
+        whoami,
+        selectedSchoolState,
+        selectedSchoolDistrict,
+        hashedPassword,
+        Occupation,
+        ParentOrVisitor,
+        Email
       }
     });
-    
+
+    res.status(201).json({ message: "Data inserted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // const bcrypt = require('bcrypt');
 
 app.post("/auth/login", async (req, res) => {

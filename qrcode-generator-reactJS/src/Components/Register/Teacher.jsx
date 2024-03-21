@@ -83,8 +83,10 @@ function Teacher() {
     return d;
   };
 
-  const YOUR_OFFICE_LATITUDE =12.968154202937821;
-  const YOUR_OFFICE_LONGITUDE =77.65520916404631;
+  const YOUR_OFFICE_LATITUDE =10.0817;
+  const YOUR_OFFICE_LONGITUDE =78.7777;
+  // const YOUR_OFFICE_LATITUDE =12.968154202937821;
+  // const YOUR_OFFICE_LONGITUDE =77.65520916404631;
 
   
 
@@ -148,6 +150,7 @@ function Teacher() {
       }
       getCurrentLocation();
       if (location) {
+        console.log(location.latitude,location.longitude);
         const distance = calculateDistance(location.latitude, location.longitude, YOUR_OFFICE_LATITUDE, YOUR_OFFICE_LONGITUDE);
         console.log(distance);
         if (distance <= 500) {

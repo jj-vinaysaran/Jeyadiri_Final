@@ -31,8 +31,8 @@ function Main() {
       eventnameConverted+=convertedname[i];
     }
     // /?eventname=event1&who=others
-    setUrlInput(`https://jayadiritest.netlify.app/?eventname=${eventnameConverted}&who=${who.substring(1)}`);
-    // setUrlInput(`http://localhost:3000/?eventname=${eventnameConverted}&who=${who.substring(1)}`);
+    // setUrlInput(`https://jayadiritest.netlify.app/?eventname=${eventnameConverted}&who=${who.substring(1)}`);
+    setUrlInput(`http://localhost:3000/?eventname=${eventnameConverted}&who=${who.substring(1)}`);
   }, [eventname]);
 
   function getQrCode() {

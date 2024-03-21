@@ -3,6 +3,10 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import './Attendance.css';
 import url from '../../Config';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 const Attendance = () => {
   const [attendance, setAttendance] = useState([]);
   const { eventName } = useParams();
@@ -29,6 +33,105 @@ const Attendance = () => {
     }
   };
 
+  const downloadExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(attendance.others);
+    XLSX.utils.book_append_sheet(wb, ws, "Others");
+    // Add sheets for Students and Teachers
+    if (attendance.students) {
+      const studentWS = XLSX.utils.json_to_sheet(attendance.students);
+      XLSX.utils.book_append_sheet(wb, studentWS, "Students");
+    }
+    if (attendance.teachers) {
+      const teacherWS = XLSX.utils.json_to_sheet(attendance.teachers);
+      XLSX.utils.book_append_sheet(wb, teacherWS, "Teachers");
+    }
+    XLSX.writeFile(wb, "attendance.xlsx");
+  };
+  const downloadExcelteachers = () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(attendance.teachers);
+    XLSX.utils.book_append_sheet(wb, ws, "Teachers");
+    // Add sheets for Students and Teachers
+    // if (attendance.students) {
+    //   const studentWS = XLSX.utils.json_to_sheet(attendance.students);
+    //   XLSX.utils.book_append_sheet(wb, studentWS, "Students");
+    // }
+    // if (attendance.teachers) {
+    //   const teacherWS = XLSX.utils.json_to_sheet(attendance.teachers);
+    //   XLSX.utils.book_append_sheet(wb, teacherWS, "Teachers");
+    // }
+    XLSX.writeFile(wb, "attendance.xlsx");
+  };
+  const downloadExcelstudents = () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(attendance.students);
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+    // // Add sheets for Students and Teachers
+    // if (attendance.students) {
+    //   const studentWS = XLSX.utils.json_to_sheet(attendance.students);
+    //   XLSX.utils.book_append_sheet(wb, studentWS, "Students");
+    // }
+    // if (attendance.teachers) {
+    //   const teacherWS = XLSX.utils.json_to_sheet(attendance.teachers);
+    //   XLSX.utils.book_append_sheet(wb, teacherWS, "Teachers");
+    // }
+    XLSX.writeFile(wb, "attendance.xlsx");
+  };
+
+  const downloadPdf = () => {
+    const doc = new jsPDF();
+    doc.text("Attendance - Others", 10, 10);
+    doc.autoTable({ html: '#others-table' });
+    // Add tables for Students and Teachers
+    // if (attendance.students) {
+    //   doc.addPage();
+    //   doc.text("Attendance - Students", 10, 10);
+    //   doc.autoTable({ html: '#students-table' });
+    // }
+    // if (attendance.teachers) {
+    //   doc.addPage();
+    //   doc.text("Attendance - Teachers", 10, 10);
+    //   doc.autoTable({ html: '#teachers-table' });
+    // }
+    doc.save('attendance.pdf');
+  };
+  const downloadPdfteachers = () => {
+    const doc = new jsPDF();
+    doc.text("Attendance - Others", 10, 10);
+    doc.autoTable({ html: '#teachers-table' });
+    // Add tables for Students and Teachers
+    // if (attendance.students) {
+    //   doc.addPage();
+    //   doc.text("Attendance - Students", 10, 10);
+    //   doc.autoTable({ html: '#students-table' });
+    // }
+    // if (attendance.teachers) {
+    //   doc.addPage();
+    //   doc.text("Attendance - Teachers", 10, 10);
+    //   doc.autoTable({ html: '#teachers-table' });
+    // }
+    doc.save('attendance.pdf');
+  };
+  const downloadPdfstudents = () => {
+    const doc = new jsPDF();
+    doc.text("Attendance - Others", 10, 10);
+    doc.autoTable({ html: '#students-table' });
+    // Add tables for Students and Teachers
+    // if (attendance.students) {
+    //   doc.addPage();
+    //   doc.text("Attendance - Students", 10, 10);
+    //   doc.autoTable({ html: '#students-table' });
+    // }
+    // if (attendance.teachers) {
+    //   doc.addPage();
+    //   doc.text("Attendance - Teachers", 10, 10);
+    //   doc.autoTable({ html: '#teachers-table' });
+    // }
+    doc.save('attendance.pdf');
+  };
+
+  
   return (
     <div className="attendance-container">
       <h1>{eventName}</h1>
@@ -37,9 +140,9 @@ const Attendance = () => {
       <div className="attendance-tables">
         <div className="table">
           <h2>Others</h2>
-          <table>
+          <table id="others-table">
             <thead>
-              <tr>
+            <tr>
                 <th>Attendance ID</th>
                 <th>User Full Name</th>
                 <th>State</th>
@@ -68,11 +171,12 @@ const Attendance = () => {
                 ))}
             </tbody>
           </table>
+          <button onClick={downloadExcel}>Export Excel</button>
+          <button onClick={downloadPdf}>Export PDF</button>
         </div>
-
         <div className="table">
           <h2>Students</h2>
-          <table>
+          <table id="students-table">
           <thead>
             <tr>
               <th>Attendance ID</th>
@@ -138,11 +242,13 @@ const Attendance = () => {
               ))}
           </tbody>
         </table>
+        <button onClick={downloadExcelstudents}>Export Excel</button>
+          {/* <button onClick={downloadPdfstudents}>Export PDF</button> */}
         </div>
 
         <div className="table">
           <h2>Teachers</h2>
-          <table>
+          <table id='teachers-table'>
             <thead>
               <tr>
                 <th>Attendance ID</th>
@@ -171,6 +277,8 @@ const Attendance = () => {
                 ))}
             </tbody>
           </table>
+          <button onClick={downloadExcelteachers}>Export Excel</button>
+          <button onClick={downloadPdfteachers}>Export PDF</button>
         </div>
       </div>
     </div>
