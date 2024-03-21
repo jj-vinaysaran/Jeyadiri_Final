@@ -18,6 +18,7 @@ function Teacher() {
   const [password, setPassword] = useState('');
   const [Email, setEmail] = useState('');
   const navigate=useNavigate();
+  const [registering, setRegistering] = useState(false);
 
   const selangorDistricts = [
     'Sabak Bernam',
@@ -49,23 +50,30 @@ function Teacher() {
 
   // Function to get current location
   const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        error => {
-          console.error(error);
-        }
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const location = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            };
+            console.log(position.coords.latitude, position.coords.longitude);
+            resolve(location);
+          },
+          error => {
+            console.error(error);
+            reject(error);
+          }
+        );
+      } else {
+        const error = new Error("Geolocation is not supported by this browser.");
+        console.error(error);
+        reject(error);
+      }
+    });
   };
-
+  
   // Function to calculate distance between two points
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3; // metres
@@ -104,9 +112,11 @@ function Teacher() {
     setDistrict(district);
   };
 
-  const handleFormSubmit = async (e) => {
+
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-  
+    setRegistering(true);
+
     try {
       // Define all possible fields
       const allFields = [
@@ -146,59 +156,81 @@ function Teacher() {
       const icNumberRegex = /^\d{6}-\d{2}-\d{4}$/;
       if (!icNumber.match(icNumberRegex)) {
         alert('Error', 'Invalid IC number format. Use: 650423-07-5659');
+        setRegistering(false)
+
         return;
       }
-      getCurrentLocation();
-      if (location) {
-        console.log(location.latitude,location.longitude);
-        const distance = calculateDistance(location.latitude, location.longitude, YOUR_OFFICE_LATITUDE, YOUR_OFFICE_LONGITUDE);
-        console.log(distance);
-        if (distance <= 500) {
-      // Update the nullFormData with the provided data
-      const formData = {
-        ...nullFormData,
-        fullName,
-        icNumber,
-        schoolName,
-        phonenumber,
-        state,
-        district,
-        whoami:"teacher",
-        password,
-        Email
-      };
   
-      // console.log(formData);
+      getCurrentLocation().then((location) => {
+        if (location) {
+          console.log(location.latitude, location.longitude);
+          const distance = calculateDistance(location.latitude, location.longitude, YOUR_OFFICE_LATITUDE, YOUR_OFFICE_LONGITUDE);
+          console.log(distance);
+          if (distance <= 500) {
+            // Update the nullFormData with the provided data
+            const formData = {
+              ...nullFormData,
+              fullName,
+              icNumber,
+              schoolName,
+              phonenumber,
+              state,
+              district,
+              whoami: "teacher",
+              password,
+              Email
+            };
   
-      const response = await axios.post(`${url}/post/${eventname}`, formData);
+            axios.post(`${url}/post/${eventname}`, formData)
+              .then((response) => {
+                if (response.status === 201) {
+                  alert("Thank you for Registering ! you may leave the site now")
+                  navigate("/certificateLoging")
+                } else {
+                  alert("Some Error Occurred")
+                }
+              })
+              .catch((error) => {
+                if (error.response && error.response.data && error.response.data.error) {
+                  alert(error.response.data.error);
+                } else {
+                  alert("Some Error Occurred while submitting the form");
+                  console.error(error);
+                }
+              });
+          } else {
+            alert("You are more than 500 meters away from the office. Cannot submit the form.");
+          }
+        }
+      }).catch((error) => {
+        alert("Error occurred while fetching location");
+        console.error(error);
+      })
+      .finally(() => {
+        setRegistering(false); // Set registering state to false after form submission completes
+      })
   
-      // Handle the response from the server if needed
-      // console.log(response.data);
-      if(response.status==201)
-      {
-        alert("Thank you for Registering ! you may leave the site now")
-          navigate("/certificateLoging")
+    }  catch (error) {
+      if (error.response && error.response.data && error.response.data.error) {
+        alert(error.response.data.error);
+      } else {
+        alert("Some Error Occurred");
+        console.error(error);
       }
-      else{
-        
-        alert("Some Error Occured")
-      }
-    }else{
-      alert("You are more than 500 meters away from the office. Cannot submit the form.");
-    }
-  }
-    } catch (err) {
-      // Handle errors
-      // console.error(err);
-      alert(err.response.data.error);
-
     }
   };
+  
   
 
   return (
     <div className='container_form'>
     <h1 className="h1">{eventname}</h1>
+    {registering && (
+      <div className="register-message">
+        <p>Registering...</p>
+      </div>
+    )}
+
     <form className="form-container" onSubmit={handleFormSubmit}>
       {/* Teacher Information */}
       <label className="label">

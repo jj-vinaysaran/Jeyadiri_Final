@@ -40,6 +40,7 @@ function Student() {
   const {eventname}=useParams();
   const [motherStatus, setMotherStatus] = useState('');
   const [Email, setEmail] = useState('');
+  const [registering, setRegistering] = useState(false);
 
   const handleMotherStatusChange = (e) => {
     setMotherStatus(e.target.value);
@@ -50,22 +51,28 @@ function Student() {
 
   // Function to get current location
   const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-          console.log(position.coords.latitude,position.coords.longitude);
-        },
-        error => {
-          console.error(error);
-        }
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const location = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            };
+            console.log(position.coords.latitude, position.coords.longitude);
+            resolve(location);
+          },
+          error => {
+            console.error(error);
+            reject(error);
+          }
+        );
+      } else {
+        const error = new Error("Geolocation is not supported by this browser.");
+        console.error(error);
+        reject(error);
+      }
+    });
   };
 
   // Function to calculate distance between two points
@@ -162,9 +169,10 @@ function Student() {
   const handleDistrictChange = (selectedDistrict) => {
     setSelectedDistrict(selectedDistrict);
   };
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    setRegistering(true);
 
-  const handleFormSubmit = async(e) => {
-    // Add logic to send the form data to the server or perform any other actions
     try {
       const allFields = [
         'fullName',
@@ -199,73 +207,95 @@ function Student() {
       ];
       const nullFormData = Object.fromEntries(allFields.map((field) => [field, null]));
   
-      e.preventDefault();
       const icNumberRegex = /^\d{6}-\d{2}-\d{4}$/;
       if (!icNumber.match(icNumberRegex)) {
         alert('Invalid IC number format. Use: 650423-07-5659');
-        return;
-      } 
-      handleAttendanceClick();
-      getCurrentLocation();
-      if (location) {
-        const distance = calculateDistance(location.latitude, location.longitude, YOUR_OFFICE_LATITUDE, YOUR_OFFICE_LONGITUDE);
-        console.log(distance);
-        if (distance <= 500) {
-      const formData = {
-        ...nullFormData,
-        fullName,
-        icNumber,
-        dateOfBirth,
-        schoolName,
-        date,
-        Class:selectedClass,
-        Race:selectedRace,
-        Fathername,
-        fatherage,
-        fatheroccupation,
-        fatherstatus:fatherStatus,
-        mothername,
-        motherage,
-        motheroccupation,
-        motherstatus:motherStatus,
-        homeaddress,
-        state: selectedState,
-        district: selectedDistrict,
-        phonenumber,
-        phonenumberfather,
-        phonenumbermother,
-        picture:"",
-        whoami:"student",
-        selectedSchoolState,
-        selectedSchoolDistrict,
-        password,
-        Email
-        
-      };
-      // console.log(formData);
-      // let arrayofname=
-      const response = await axios.post(`${url}/post/${eventname}`, formData);
-  
-      // Handle the response from the server if needed
-      // console.log(response.data);
-      if(response.status==201)
-      {
-        alert("Thank you for Registering ! you may leave the site now")
-        navigate("/certificateLoging")
+        setRegistering(false)
 
+        return;
       }
-      else{
-        alert("Some Error Occured")
-      }
-    }
-    else{
-      alert("You are more than 500 meters away from the office. Cannot submit the form.");
-    }
-  }
+  
+      // Handle attendance click
+      handleAttendanceClick();
+  
+      // Get current location
+      getCurrentLocation().then((location) => {
+        if (location) {
+          const distance = calculateDistance(location.latitude, location.longitude, YOUR_OFFICE_LATITUDE, YOUR_OFFICE_LONGITUDE);
+          console.log(distance);
+          if (distance <= 500) {
+            const formData = {
+              ...nullFormData,
+              fullName,
+              icNumber,
+              dateOfBirth,
+              schoolName,
+              date,
+              Class: selectedClass,
+              Race: selectedRace,
+              Fathername,
+              fatherage,
+              fatheroccupation,
+              fatherstatus: fatherStatus,
+              mothername,
+              motherage,
+              motheroccupation,
+              motherstatus: motherStatus,
+              homeaddress,
+              state: selectedState,
+              district: selectedDistrict,
+              phonenumber,
+              phonenumberfather,
+              phonenumbermother,
+              picture: "",
+              whoami: "student",
+              selectedSchoolState,
+              selectedSchoolDistrict,
+              password,
+              Email
+            };
+  
+            axios.post(`${url}/post/${eventname}`, formData)
+              .then((response) => {
+                if (response.status === 201) {
+                  alert("Thank you for Registering! You may leave the site now.");
+                  navigate("/certificateLoging");
+                } else {
+                  alert("Some Error Occurred");
+                }
+              })
+              .catch((error) => {
+                if (error.response && error.response.data && error.response.data.error) {
+                  alert(error.response.data.error);
+                } else {
+                  alert("Some Error Occurred while submitting the form");
+                  console.error(error);
+                }
+              });
+          } else {
+            alert("You are more than 500 meters away from the office. Cannot submit the form.");
+          }
+        }
+      }).catch((error) => {
+        alert("Error occurred while fetching location");
+        console.error(error);
+      })
+      .finally(() => {
+        setRegistering(false); // Set registering state to false after form submission completes
+      })
+  
     } catch (error) {
-      alert(error.response.data.error);
+      if (error.response && error.response.data && error.response.data.error) {
+        alert(error.response.data.error);
+      } else {
+        alert("Some Error Occurred");
+        console.error(error);
+      }
     }
   };
+  
+  
+
   const classOptions = [
     { label: "Select Class Type", value: "" },
     { label: "3", value: "3" },
@@ -303,6 +333,12 @@ function Student() {
   };
   return (
     <div className='container_form'>
+      {registering && (
+      <div className="register-message">
+        <p>Registering...</p>
+      </div>
+    )}
+
       <form onSubmit={handleFormSubmit} className="form-container">
         {/* Personal Information */}
         <label className="label">
